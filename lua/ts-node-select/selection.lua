@@ -11,14 +11,17 @@ local selections = {}
 -- Get node at cursor (NEW API) =>
 local function get_node_at_cursor(buf)
   local row, col = unpack(vim.api.nvim_win_get_cursor(0))
-  row = row - 1 -- cursor row is 1-based
+  row = row - 1
 
   local parser = vim.treesitter.get_parser(buf)
 
-  -- NEW API: no manual ranges
+  -- NEW API: no custom ranges needed
   parser:parse()
 
-  local lang_tree = parser:language_for_range({ row, col, row, col })
+  local lang_tree = parser:language_for_range(
+    { row, col },
+    { row, col }
+  )
   if not lang_tree then return end
 
   for _, tree in ipairs(lang_tree:trees()) do
