@@ -6,18 +6,19 @@ local core = require("ts-node-select.core")
 local keymaps = require("ts-node-select.keymaps")
 local selection = require("ts-node-select.selection")
 
-
 function M.setup(opts)
   opts = opts or {}
-  -- Set up the core (Treesitter starup)
+
+  -- Start Treesitter safely
   core.setup()
 
-  -- Set up keymaps or (pass options)
+  -- Setup keymaps
   keymaps.setup(opts.keymaps)
 end
 
-M.init = selection.init
-M.expand = selecton.expand
+-- Public API
+M.init   = selection.init
+M.expand = selection.expand
 M.shrink = selection.shrink
 
 return M
