@@ -15,10 +15,8 @@ local function get_node_at_cursor(buf)
 
   local parser = vim.treesitter.get_parser(buf)
 
-  -- Parse only visible window range (performance-friendly)
-  parser:parse({
-    { vim.fn.line("w0") - 1, 0, vim.fn.line("w$"), -1 },
-  })
+  -- NEW API: no manual ranges
+  parser:parse()
 
   local lang_tree = parser:language_for_range({ row, col, row, col })
   if not lang_tree then return end
