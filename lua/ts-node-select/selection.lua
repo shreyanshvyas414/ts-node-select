@@ -18,11 +18,17 @@ local function get_node_at_cursor(buf)
     ignore_injections = false
   })
 
-  if not ok then
+  if not ok or not node then
     return nil
   end
 
   return node
+end
+
+-- Check if tree-sitter is active for this buffer
+local function is_treesitter_active(buf)
+  local ok, parser = pcall(vim.treesitter.get_parser, buf)
+  return ok and parser ~= nil
 end
 
 -- Visual selection helper
@@ -56,11 +62,19 @@ end
 -- Initialize selection
 function M.init()
   local buf = vim.api.nvim_get_current_buf()
+  
+  -- Check if tree-sitter is even active
+  if not is_treesitter_active(buf) then
+    return
+  end
+  
+  -- Reset selection stack for this buffer
   selections[buf] = {}
 
   local node = get_node_at_cursor(buf)
   if not node then
-    -- Silently fail - don't show notification for special buffers
+    -- No node at cursor - this is normal for empty lines, whitespace, etc.
+    -- Just do nothing silently
     return
   end
 
@@ -71,19 +85,38 @@ end
 -- Expand selection
 function M.expand()
   local buf = vim.api.nvim_get_current_buf()
+  
+  -- Check if tree-sitter is active
+  if not is_treesitter_active(buf) then
+    return
+  end
+  
   local stack = selections[buf]
   
+  -- If no selection stack exists, try to initialize
   if not stack or #stack == 0 then
     return M.init()
   end
 
   local current = stack[#stack]
+  
+  -- Validate that the current node is still valid
+  if not current or not pcall(current.range, current) then
+    -- Node became invalid, reinitialize
+    return M.init()
+  end
+  
   local parent = current:parent()
 
   -- Find parent with different range
   while parent do
-    local current_range = { current:range() }
-    local parent_range = { parent:range() }
+    local ok_current, current_range = pcall(function() return { current:range() } end)
+    local ok_parent, parent_range = pcall(function() return { parent:range() } end)
+    
+    if not ok_current or not ok_parent then
+      -- Something went wrong, stop
+      return
+    end
     
     if not vim.deep_equal(current_range, parent_range) then
       table.insert(stack, parent)
@@ -95,8 +128,7 @@ function M.expand()
     parent = parent:parent()
   end
   
-  -- At root, can't expand further
-  -- Silently do nothing
+  -- At root, can't expand further - silently do nothing
 end
 
 -- Shrink selection
@@ -104,13 +136,22 @@ function M.shrink()
   local buf = vim.api.nvim_get_current_buf()
   local stack = selections[buf]
   
+  -- Need at least 2 nodes to shrink
   if not stack or #stack <= 1 then
-    -- Silently do nothing
     return
   end
 
+  -- Remove current node from stack
   table.remove(stack)
-  select_node(buf, stack[#stack])
+  
+  -- Select previous node
+  local node = stack[#stack]
+  if node and pcall(node.range, node) then
+    select_node(buf, node)
+  else
+    -- Previous node is invalid, clear stack
+    selections[buf] = {}
+  end
 end
 
 return M
