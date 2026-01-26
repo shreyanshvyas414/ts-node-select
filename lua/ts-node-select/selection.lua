@@ -1,5 +1,4 @@
 -- lua/ts-node-select/selection.lua
--- Alternative implementation using simpler API
 local M = {}
 
 -- Buffer => node stack
@@ -13,11 +12,15 @@ local function get_node_at_cursor(buf)
   local col = cursor[2]
 
   -- Use vim.treesitter.get_node() - simpler and more reliable
-  local node = vim.treesitter.get_node({
+  local ok, node = pcall(vim.treesitter.get_node, {
     bufnr = buf,
     pos = { row, col },
     ignore_injections = false
   })
+
+  if not ok then
+    return nil
+  end
 
   return node
 end
@@ -57,7 +60,7 @@ function M.init()
 
   local node = get_node_at_cursor(buf)
   if not node then
-    vim.notify("No tree-sitter node at cursor", vim.log.levels.WARN)
+    -- Silently fail - don't show notification for special buffers
     return
   end
 
@@ -93,7 +96,7 @@ function M.expand()
   end
   
   -- At root, can't expand further
-  vim.notify("Cannot expand further", vim.log.levels.INFO)
+  -- Silently do nothing
 end
 
 -- Shrink selection
@@ -102,7 +105,7 @@ function M.shrink()
   local stack = selections[buf]
   
   if not stack or #stack <= 1 then
-    vim.notify("Cannot shrink further", vim.log.levels.INFO)
+    -- Silently do nothing
     return
   end
 

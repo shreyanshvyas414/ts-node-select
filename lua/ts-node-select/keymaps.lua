@@ -2,6 +2,7 @@
 
 local M = {}
 local selection = require("ts-node-select.selection")
+local core = require("ts-node-select.core")
 
 --- Setup default keymaps per buffer
 ---
@@ -23,6 +24,12 @@ function M.setup(opts)
     group = group,
     callback = function()
       local bufnr = vim.api.nvim_get_current_buf()
+      
+      -- Skip excluded buffers (oil, neo-tree, etc.)
+      if core.should_exclude(bufnr) then
+        return
+      end
+      
       local ft = vim.bo[bufnr].filetype
 
       -- Get language for this filetype
