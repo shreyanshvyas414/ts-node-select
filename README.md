@@ -1,3 +1,30 @@
+<p align="center">
+  <img src="./assets/ts-node-select.png" width="420" alt="ts-node-select logo" />
+</p>
+
+<h1 align="center">ts-node-select</h1>
+
+<p align="center">
+  🌳 <b>Modern incremental selection for Neovim using the new Tree-sitter API</b> 🌳
+</p>
+
+<p align="center">
+  <a href="https://github.com/shreyanshvyas414/ts-node-select/stargazers">⭐ Stars</a> ·
+  <a href="https://github.com/shreyanshvyas414/ts-node-select/issues">🐛 Issues</a> ·
+  <a href="https://github.com/shreyanshvyas414/ts-node-select/blob/master/LICENSE">📜 License</a>
+</p>
+
+<p align="center">
+  🚀 Built with the new <code>vim.treesitter</code> API ·
+  🧠 Deterministic selection ·
+  ✨ Hackable & lightweight
+</p>
+
+<p align="center">
+  🌱 → 🌿 → 🌳 <br/>
+  <sub>Select smarter. Expand cleaner. Shrink predictably.</sub>
+</p>
+
 # ts-node-select
 
 Modern incremental selection for Neovim using the new Tree-sitter API.
