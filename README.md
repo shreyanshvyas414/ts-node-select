@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/ts-node-select.png" width="420" alt="ts-node-select logo" />
+  <img src="./assets/ts-node-select.png" width="320" alt="ts-node-select logo" />
 </p>
 
 <h1 align="center">ts-node-select</h1>
@@ -9,9 +9,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/shreyanshvyas414/ts-node-select/stargazers">⭐ Stars</a> ·
-  <a href="https://github.com/shreyanshvyas414/ts-node-select/issues">🐛 Issues</a> ·
-  <a href="https://github.com/shreyanshvyas414/ts-node-select/blob/master/LICENSE">📜 License</a>
+  <img src="https://img.shields.io/github/stars/shreyanshvyas414/ts-node-select?style=flat-square" />
+  <img src="https://img.shields.io/github/issues/shreyanshvyas414/ts-node-select?style=flat-square" />
+  <img src="https://img.shields.io/github/license/shreyanshvyas414/ts-node-select?style=flat-square" />
 </p>
 
 <p align="center">
