@@ -16,27 +16,27 @@ local selection = require("ts-node-select.selection")
 ---     @field filetypes string[] Additional filetypes to exclude
 ---     @field buftypes string[] Additional buftypes to exclude
 function M.setup(opts)
-  opts = opts or {}
-  
-  -- Handle exclusions if provided
-  if opts.exclude then
-    if opts.exclude.filetypes then
-      core.add_excluded_filetypes(opts.exclude.filetypes)
-    end
-    if opts.exclude.buftypes then
-      core.add_excluded_buftypes(opts.exclude.buftypes)
-    end
-  end
-  
-  -- Start Treesitter safely
-  core.setup()
-  
-  -- Setup keymaps
-  keymaps.setup(opts.keymaps)
+	opts = opts or {}
+
+	-- Handle exclusions if provided
+	if opts.exclude then
+		if opts.exclude.filetypes then
+			core.add_excluded_filetypes(opts.exclude.filetypes)
+		end
+		if opts.exclude.buftypes then
+			core.add_excluded_buftypes(opts.exclude.buftypes)
+		end
+	end
+
+	-- Start Treesitter safely
+	core.setup()
+
+	-- Setup keymaps
+	keymaps.setup(opts.keymaps)
 end
 
 -- Public API
-M.init   = selection.init
+M.init = selection.init
 M.expand = selection.expand
 M.shrink = selection.shrink
 
