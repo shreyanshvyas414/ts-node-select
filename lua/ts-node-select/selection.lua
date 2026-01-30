@@ -1,51 +1,84 @@
 -- lua/ts-node-select/selection.lua
+
 local M = {}
 
 -- Buffer => node stack
 local selections = {}
 
 -- Get node at cursor - simplified approach
-local function get_node_at_cursor(buf)
+local function get_node_at_cursor(bufnr)
+	bufnr = bufnr or vim.api.nvim_get_current_buf()
+
 	-- Get cursor position
 	local cursor = vim.api.nvim_win_get_cursor(0)
 	local row = cursor[1] - 1 -- Convert to 0-indexed
 	local col = cursor[2]
 
-	-- Use vim.treesitter.get_node() - simpler and more reliable
+	-- Fast path: Try vim.treesitter.get_node() first (0(depth))
+	-- Changing bacause it's cheap and works most of the time
+	-- But sometime breaks.
 	local ok, node = pcall(vim.treesitter.get_node, {
-		bufnr = buf,
+		bufnr = bufnr,
 		pos = { row, col },
 		ignore_injections = false,
 	})
 
-	if not ok or not node then
+	if ok or node then
+		return node
+	end
+	-- Using fallback path => Parsed based apporch (0(tree walk))
+	-- Only when get_node() breaks (very rare) but will optimized.
+	local parser_ok, parser = pcall(vim.treesitter.get_parser, bufnr)
+
+	if not parser_ok or not parser then
 		return nil
 	end
 
-	return node
+	-- Get the syntax tree
+	local trees = parser:parse()
+	if not trees or #trees == 0 then
+		return nil
+	end
+
+	-- Get root and find node at cursor
+	local root = trees[1]:root()
+	if not root then
+		return nil
+	end
+
+	-- Use named_descendent_for_range for accurate node detection
+	local node_fallback = root:named_descendant_for_range(row, col, row, col)
+
+	-- If no named node, try unamed
+	if not node_fallback then
+		node_fallback = root:descendant_for_range(row, col, row, col)
+	end
+
+	return node_fallback
 end
 
 -- Check if tree-sitter is active for this buffer
-local function is_treesitter_active(buf)
-	local ok, parser = pcall(vim.treesitter.get_parser, buf)
+local function is_treesitter_active(bufnr)
+	bufnr = bufnr or vim.api.nvim_get_current_buf()
+	local ok, parser = pcall(vim.treesitter.get_parser, bufnr)
 	return ok and parser ~= nil
 end
 
 -- Visual selection helper
-local function select_node(buf, node)
+local function select_node(bufnr, node)
 	if not node then
 		return
 	end
 
 	local sr, sc, er, ec = node:range()
-	local last_line = vim.api.nvim_buf_line_count(buf)
+	local last_line = vim.api.nvim_buf_line_count(bufnr)
 
 	-- Handle edge cases
 	local end_row = math.min(er + 1, last_line)
 	local end_col = ec
 
 	if er + 1 > last_line then
-		local line = vim.api.nvim_buf_get_lines(buf, last_line - 1, last_line, true)[1]
+		local line = vim.api.nvim_buf_get_lines(bufnr, last_line - 1, last_line, true)[1]
 		end_col = line and #line or 0
 	end
 
@@ -63,37 +96,37 @@ end
 
 -- Initialize selection
 function M.init()
-	local buf = vim.api.nvim_get_current_buf()
+	local bufnr = vim.api.nvim_get_current_buf()
 
 	-- Check if tree-sitter is even active
-	if not is_treesitter_active(buf) then
+	if not is_treesitter_active(bufnr) then
 		return
 	end
 
 	-- Reset selection stack for this buffer
-	selections[buf] = {}
+	selections[bufnr] = {}
 
-	local node = get_node_at_cursor(buf)
+	local node = get_node_at_cursor(bufnr)
 	if not node then
 		-- No node at cursor - this is normal for empty lines, whitespace, etc.
 		-- Just do nothing silently
 		return
 	end
 
-	table.insert(selections[buf], node)
-	select_node(buf, node)
+	table.insert(selections[bufnr], node)
+	select_node(bufnr, node)
 end
 
 -- Expand selection
 function M.expand()
-	local buf = vim.api.nvim_get_current_buf()
+	local bufnr = vim.api.nvim_get_current_buf()
 
 	-- Check if tree-sitter is active
-	if not is_treesitter_active(buf) then
+	if not is_treesitter_active(bufnr) then
 		return
 	end
 
-	local stack = selections[buf]
+	local stack = selections[bufnr]
 
 	-- If no selection stack exists, try to initialize
 	if not stack or #stack == 0 then
@@ -139,8 +172,8 @@ end
 
 -- Shrink selection
 function M.shrink()
-	local buf = vim.api.nvim_get_current_buf()
-	local stack = selections[buf]
+	local bufnr = vim.api.nvim_get_current_buf()
+	local stack = selections[bufnr]
 
 	-- Need at least 2 nodes to shrink
 	if not stack or #stack <= 1 then
@@ -153,10 +186,10 @@ function M.shrink()
 	-- Select previous node
 	local node = stack[#stack]
 	if node and pcall(node.range, node) then
-		select_node(buf, node)
+		select_node(bufnr, node)
 	else
 		-- Previous node is invalid, clear stack
-		selections[buf] = {}
+		selections[bufnr] = {}
 	end
 end
 
