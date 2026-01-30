@@ -61,7 +61,7 @@ If you previously used `init_selection`, `node_incremental`, and
 ```lua
 {
   "shreyanshvyas414/ts-node-select",
-  version = "^0.1.1", -- Use latest v0.1.1
+  version = "^0.1.1", -- Use latest v(0.1.1)
   dependencies = {
     "nvim-treesitter/nvim-treesitter",
   },
