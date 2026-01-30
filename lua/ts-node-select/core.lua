@@ -49,11 +49,28 @@ local function should_exclude(bufnr)
 	return false
 end
 
+-- Check If treesitter parser is available for buffer
+local function has_parser(bufnr)
+	local ft = vim.bo[bufnr].filetype
+	if not ft or ft == "" then
+		return false
+	end
+
+	-- Get language for filetype
+	local lang = vim.treesitter.language.get_lang(ft)
+	if not lang then
+		return false
+	end
+
+	-- check if parser exists
+	return pcall(vim.treesitter.get_parser, bufnr, lang)
+end
+
 function M.setup()
 	-- Create an autogroup to prevent duplicate autocmds
 	local group = vim.api.nvim_create_augroup("TSNodeSelect", { clear = true })
 
-	vim.api.nvim_create_autocmd("FileType", {
+	vim.api.nvim_create_autocmd("BufEnter", "FileType", {
 		group = group,
 		callback = function()
 			local bufnr = vim.api.nvim_get_current_buf()
@@ -63,7 +80,15 @@ function M.setup()
 				return
 			end
 
+			-- SKip if buffer is not valid or loaded
+			if not vim.api.nvim_buf_is_valid(bufnr) or not vim.api.nvim_buf_is_loaded(bufnr) then
+				return
+			end
+
 			local ft = vim.bo[bufnr].filetype
+			if not ft or ft == "" then
+				return
+			end
 
 			-- Get the language for this filetype
 			local lang = vim.treesitter.language.get_lang(ft)
@@ -71,21 +96,21 @@ function M.setup()
 				return
 			end
 
-			-- Try to add the language parser
 			-- This checks if the parser exists
-			local has_parser = pcall(vim.treesitter.language.add, lang)
-			if not has_parser then
+			local ok, parser = pcall(vim.treesitter.ger_parser, bufnr, lang)
+			if not ok or not parser then
 				return
 			end
 
 			-- If parser exists, start treesitter for this buffer
-			pcall(vim.treesitter.start)
+			pcall(vim.treesitter.start, bufnr, lang)
 		end,
 	})
 end
 
 -- Expose should_exclude for use in other modules
 M.should_exclude = should_exclude
+M.has_parser = has_parser
 
 -- Allow users to add custom exclusions
 function M.add_excluded_filetypes(filetypes)
