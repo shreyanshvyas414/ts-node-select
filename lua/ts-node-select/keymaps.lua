@@ -1,6 +1,7 @@
 -- lua/ts-node-select/keymaps.lua
 
 local M = {}
+
 local selection = require("ts-node-select.selection")
 local core = require("ts-node-select.core")
 
@@ -20,27 +21,34 @@ function M.setup(opts)
 	-- Create autogroup to prevent duplicate autocmds
 	local group = vim.api.nvim_create_augroup("TSNodeSelectKeymaps", { clear = true })
 
-	vim.api.nvim_create_autocmd("FileType", {
+	vim.api.nvim_create_autocmd({ "BufEnter", "FileType" }, {
 		group = group,
-		callback = function()
-			local bufnr = vim.api.nvim_get_current_buf()
+		callback = function(args)
+			local bufnr = args.buf or vim.api.nvim_get_current_buf()
 
 			-- Skip excluded buffers (oil, neo-tree, etc.)
 			if core.should_exclude(bufnr) then
 				return
 			end
 
-			local ft = vim.bo[bufnr].filetype
-
-			-- Get language for this filetype
-			local lang = vim.treesitter.language.get_lang(ft)
-			if not lang then
+			-- Skips if buffer is not valid or loaded
+			if not vim.api.nvim_buf_is_valid(bufnr) or not vim.api.nvim_buf_is_loaded(bufnr) then
 				return
 			end
 
-			-- Only map keys if Treesitter parser exists
-			local has_parser = pcall(vim.treesitter.language.add, lang)
-			if not has_parser then
+			local ft = vim.bo[bufnr].filetype
+			if not ft or ft == 0 then
+				return
+			end
+
+			if not core.has_parser(bufnr) then
+				return
+			end
+
+			-- Check if keymaps already exists or set for this buffer
+			-- This prevents duplicate keymaps on BufEnter
+			local existing = vim.fn.maparg(init_key, "n", false, true)
+			if existing.buffer == bufnr then
 				return
 			end
 
@@ -54,7 +62,7 @@ function M.setup(opts)
 			-- Visual mode: expand selection
 			vim.keymap.set("x", expand_key, selection.expand, {
 				buffer = bufnr,
-				desc = "TS: Expand selection",
+				desc = "TS: Shrink selection",
 				silent = true,
 			})
 
