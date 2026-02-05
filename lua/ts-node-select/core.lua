@@ -70,7 +70,7 @@ function M.setup()
 	-- Create an autogroup to prevent duplicate autocmds
 	local group = vim.api.nvim_create_augroup("TSNodeSelect", { clear = true })
 
-	vim.api.nvim_create_autocmd("BufEnter", "FileType", {
+	vim.api.nvim_create_autocmd({"BufEnter", "FileType"}, {
 		group = group,
 		callback = function()
 			local bufnr = vim.api.nvim_get_current_buf()
@@ -97,7 +97,7 @@ function M.setup()
 			end
 
 			-- This checks if the parser exists
-			local ok, parser = pcall(vim.treesitter.ger_parser, bufnr, lang)
+			local ok, parser = pcall(vim.treesitter.get_parser, bufnr, lang)
 			if not ok or not parser then
 				return
 			end
