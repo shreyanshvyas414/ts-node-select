@@ -56,8 +56,8 @@ If you previously used `init_selection`, `node_incremental`, and
 
 ```lua
 {
-  "shreyanshvyas414/ts-node-select",
-  version = "^0.1.2", -- Use latest v(0.1.2)
+ "shreyanshvyas414/ts-node-select",
+  version = "release/v0.1.2", -- Recommended use for latest(neovim nightly builds) v(0.1.2).
   dependencies = {
     "nvim-treesitter/nvim-treesitter",
   },
@@ -328,7 +328,7 @@ require("ts-node-select").setup({
 
 ## 📝 Version History
 
-### v0.1.2 - Neovim Nightly Compatibility & Bug Fixes (2025-02-04)
+### release/v0.1.2 - Neovim Nightly Compatibility & Bug Fixes (2025-02-04)
 
 ## What's Fixed:
 
@@ -347,7 +347,7 @@ require("ts-node-select").setup({
 - All language support and maintained.
 
 ### Upgrade Instructions
-Update your `lazy.nvim` config to use `version = "^0.1.2"`
+Update your `lazy.nvim` config to use `version = "release/v0.1.2"`
 
 See [CHANGELOG.md](CHANGELOG.md) for complete details.
 
