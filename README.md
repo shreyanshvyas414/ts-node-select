@@ -1,10 +1,4 @@
-<p>update</p>
-
-<p align="center">
-  <img src="./assets/ts-node-select.png" width="320" alt="ts-node-select logo" />
-</p>
-
-<h1 align="center">ts-node-select</h1>
+<h1 align="center">ts-node-select.</h1>
 
 <p align="center">
   🌳 <b>Modern incremental selection for Neovim using the new Tree-sitter API</b> 🌳
@@ -63,7 +57,7 @@ If you previously used `init_selection`, `node_incremental`, and
 ```lua
 {
   "shreyanshvyas414/ts-node-select",
-  version = "^0.1.1", -- Use latest v(0.1.1)
+  version = "^0.1.2", -- Use latest v(0.1.2)
   dependencies = {
     "nvim-treesitter/nvim-treesitter",
   },
@@ -333,6 +327,29 @@ require("ts-node-select").setup({
 ---
 
 ## 📝 Version History
+
+### v0.1.2 - Neovim Nightly Compatibility & Bug Fixes (2025-02-04)
+
+## What's Fixed:
+
+-  This release resolves critical compatibility issues with Neovim 
+    nightly builds and fixes several runtime bugs.
+
+**Critical Fixes:**
+- Fixed `E5113` error on Neovim nightly (incorrect `nvim_create_autocmd` API usage).
+- Fixed parser detection typo preventing treesitter validation
+- Fixed filetype comparison type error
+- Fixed undefined variable in expand selection logic
+
+**Compatibility:**
+- Works on Neovim stable (0.11+).
+- Works on Neovim nightly
+- All language support and maintained.
+
+### Upgrade Instructions
+Update your `lazy.nvim` config to use `version = "^0.1.2"`
+
+See [CHANGELOG.md](CHANGELOG.md) for complete details.
 
 ### v0.1.1 - Multi-Language Support & Performance (2026-01-30)
 
