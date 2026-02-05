@@ -37,7 +37,7 @@ function M.setup(opts)
 			end
 
 			local ft = vim.bo[bufnr].filetype
-			if not ft or ft == 0 then
+			if not ft or ft == "" then
 				return
 			end
 
