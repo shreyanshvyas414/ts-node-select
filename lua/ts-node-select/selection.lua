@@ -159,7 +159,7 @@ function M.expand()
 
 		if not vim.deep_equal(current_range, parent_range) then
 			table.insert(stack, parent)
-			select_node(buf, parent)
+			select_node(bufnr, parent)
 			return
 		end
 
