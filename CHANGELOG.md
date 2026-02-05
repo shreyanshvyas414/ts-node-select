@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-02-04
+
+### Fixed
+- **CRITICAL**: Fixed Compatiblity with the nightly builds
+  - Corrected `nvim_create_autocmd` API usage in `core.lua`.
+    (events must be passed as table)
+  - Fixed typo: `ger_parser` => `get_parser` in parser detection.
+  - Fixed typo: `ft == 0` => `ft == ""` in filetype validation in `keymaps.lua`.
+  - Fixed variable name: `buf` => `bufnr` in node selection in `selection.lua`.
+
+### Technical Details
+**Why the plugin crashed on Neovim nightly:**
+    - The `nvim_create_autocmd` API signature changed to require event as
+    a table, Old (incorrect) `nvim_create_autocmd("BufEnter", "FileType", {...})`
+    New (correct) `vim_create_autocmd({"BufEnter", "FileType"}, {...})`.
+
+    **Additional bugs fixed:**
+    - Typo in `vim.treesitter.get_parser` call prevented parser detection.
+    - Incorrect type comparison for filetype (number vs string).
+    - Wrong variable name in expand selection logic.
+
+    These fixes ensure compatibility with both stable and nightly Neovim versions.
+
+
 ## [0.1.1] - 2026-01-30
 
 ### Fixed
