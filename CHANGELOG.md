@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed typo: `ger_parser` => `get_parser` in parser detection.
   - Fixed typo: `ft == 0` => `ft == ""` in filetype validation in `keymaps.lua`.
   - Fixed variable name: `buf` => `bufnr` in node selection in `selection.lua`.
+  - **Fixed cursor position bounds checking in `selection.lua`** (resolves E5108 error)
+    * Added proper bounds clamping for start and end positions
+    * Validates column position against actual line length
+    * Prevents "Cursor position outside buffer" errors
 
 ### Technical Details
 **Why the plugin crashed on Neovim nightly:**
@@ -25,9 +29,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Typo in `vim.treesitter.get_parser` call prevented parser detection.
     - Incorrect type comparison for filetype (number vs string).
     - Wrong variable name in expand selection logic.
+    - Cursor position could exceed buffer bounds causing E5108 errors.
 
-    These fixes ensure compatibility with both stable and nightly Neovim versions.
+**Cursor bounds fix details:**
+    - Start and end row positions are now clamped to valid line numbers (1 to last_line)
+    - Column positions are validated against actual line length
+    - Handles edge cases with empty lines and end-of-buffer selections
+    - Prevents crashes when selecting nodes near buffer boundaries
 
+These fixes ensure compatibility with both stable and nightly Neovim versions.
 
 ## [0.1.1] - 2026-01-30
 
