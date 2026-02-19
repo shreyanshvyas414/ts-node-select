@@ -73,14 +73,17 @@ local function select_node(bufnr, node)
 	local sr, sc, er, ec = node:range()
 	local last_line = vim.api.nvim_buf_line_count(bufnr)
 
-	-- Handle edge cases
-	local end_row = math.min(er + 1, last_line)
-	local end_col = ec
+	-- Clamp start position
+	local start_row = math.max(1, math.min(sr + 1, last_line))
+	local start_col = math.max(0, sc)
 
-	if er + 1 > last_line then
-		local line = vim.api.nvim_buf_get_lines(bufnr, last_line - 1, last_line, true)[1]
-		end_col = line and #line or 0
-	end
+	-- Clamp end position
+	local end_row = math.max(1, math.min(er + 1, last_line))
+
+	-- Get the actual line to check column bounds
+	local end_line_text = vim.api.nvim_buf_get_lines(bufnr, end_row - 1, end_row, true)[1] or ""
+	local max_col = #end_line_text
+	local end_col = math.max(0, math.min(ec, max_col))
 
 	-- Enter visual mode if not already
 	local mode = vim.api.nvim_get_mode().mode
@@ -88,8 +91,8 @@ local function select_node(bufnr, node)
 		vim.cmd("normal! v")
 	end
 
-	-- Set selection
-	vim.api.nvim_win_set_cursor(0, { sr + 1, sc })
+	-- Set selection with bounds-checked positions
+	vim.api.nvim_win_set_cursor(0, { start_row, start_col })
 	vim.cmd("normal! o")
 	vim.api.nvim_win_set_cursor(0, { end_row, math.max(end_col - 1, 0) })
 end
