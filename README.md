@@ -5,9 +5,9 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/stars/shreyanshvyas414/ts-node-select?style=flat-square" />
-  <img src="https://img.shields.io/github/issues/shreyanshvyas414/ts-node-select?style=flat-square" />
-  <img src="https://img.shields.io/github/license/shreyanshvyas414/ts-node-select?style=flat-square" />
+  <img src="https://img.shields.io/github/stars/shrey99sh/ts-node-select?style=flat-square" />
+  <img src="https://img.shields.io/github/issues/shrey99sh/ts-node-select?style=flat-square" />
+  <img src="https://img.shields.io/github/license/shrey99sh/ts-node-select?style=flat-square" />
 </p>
 
 <p align="center">
@@ -28,7 +28,7 @@
 
 ```lua
 {
-  "shreyanshvyas414/ts-node-select",
+  "shrey99sh/ts-node-select",
   version = "release/v0.1.2",
   dependencies = { "nvim-treesitter/nvim-treesitter" },
   config = function()
@@ -41,7 +41,7 @@
 
 ```lua
 use {
-  "shreyanshvyas414/ts-node-select",
+  "shrey99sh/ts-node-select",
   requires = { "nvim-treesitter/nvim-treesitter" },
   config = function()
     require("ts-node-select").setup()
@@ -101,7 +101,7 @@ If the plugin isn't working, check that the parser is installed and loaded:
 Clone the repo, make your changes, and open a pull request. Bug fixes, features, docs — all welcome!
 
 ```bash
-git clone https://github.com/shreyanshvyas414/ts-node-select.git
+git clone https://github.com/shrey99sh/ts-node-select.git
 ```
 
 ---
